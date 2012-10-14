@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using CryptoExamples.DES;
 using CryptoExamples.Util;
+using System.ComponentModel;
 
 namespace CryptoExamples
 {
@@ -11,6 +12,10 @@ namespace CryptoExamples
         public Form1()
         {
             InitializeComponent();
+            backgroundWorkerThreadOne.DoWork += DoWork;            
+            backgroundWorkerThreadOne.RunWorkerCompleted += BwRunWorkerOneCompleted;
+            backgroundWorkerThreadOne.WorkerReportsProgress = true;
+
             toolStripStatusLabel.Text = "Select Type and Algorithm";
         }
 
@@ -84,6 +89,26 @@ namespace CryptoExamples
             {
                 MessageBox.Show("Please enter the Plain text and the Key for encryption.");
             }
+
+            toolStripProgressBar1.Style = ProgressBarStyle.Marquee;
+            toolStripProgressBar1.MarqueeAnimationSpeed = 30;
+            toolStripProgressBar1.Visible = true;
+            backgroundWorkerThreadOne.RunWorkerAsync();
+
+
+        }
+
+
+
+
+        private void BwRunWorkerOneCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            toolStripProgressBar1.Visible = false;            
+        }
+
+        private void DoWork(object sender, DoWorkEventArgs doWorkEventArgs)
+        {
+
             DateTime begin = DateTime.UtcNow;
             switch (sltAlgorithm.SelectedIndex)
             {
@@ -91,9 +116,9 @@ namespace CryptoExamples
                     switch (comboModes.SelectedIndex)
                     {
                         case 0:
-                            
+
                             DESAlgorithm des = new DESAlgorithm();
-                            string encryptedString = des.encrypt(txtPlain.Text, Utility.String2HexArray(txtKey.Text, 16)[0]);                           
+                            string encryptedString = des.encrypt(txtPlain.Text, Utility.String2HexArray(txtKey.Text, 16)[0]);
                             txtCypher.Text = encryptedString;
                             break;
                     }
@@ -104,6 +129,6 @@ namespace CryptoExamples
             DateTime end = DateTime.UtcNow;
             toolStripStatusLabel.Text = "Elapsed time: " + (end - begin).ToString("c");
         }
-
+        
     }
 }
