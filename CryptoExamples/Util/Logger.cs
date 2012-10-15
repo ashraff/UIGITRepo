@@ -1,22 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Diagnostics;
-
-namespace CryptoExamples.Util
+﻿namespace CryptoExamples.Util
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Linq;
+    using System.Text;
+
     public class Logger
     {
-        
+        #region Methods
+
         public static void Log(string message)
         {
-            Console.WriteLine(message);                       
+            Console.WriteLine(message);
         }
 
         public static void Log(Type type, string message)
         {
             // Log(type.FullName + ":" + message);
         }
+
+        #endregion Methods
     }
 }

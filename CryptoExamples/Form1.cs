@@ -1,22 +1,110 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
-using CryptoExamples.DES;
-using CryptoExamples.Util;
-using System.ComponentModel;
-
-namespace CryptoExamples
+﻿namespace CryptoExamples
 {
+    using System;
+    using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.Windows.Forms;
+
+    using CryptoExamples.DES;
+    using CryptoExamples.Util;
+
     public partial class Form1 : Form
     {
+        #region Constructors
+
         public Form1()
         {
             InitializeComponent();
-            backgroundWorkerThreadOne.DoWork += DoWork;            
+            backgroundWorkerThreadOne.DoWork += DoWork;
             backgroundWorkerThreadOne.RunWorkerCompleted += BwRunWorkerOneCompleted;
             backgroundWorkerThreadOne.WorkerReportsProgress = true;
 
             toolStripStatusLabel.Text = "Select Type and Algorithm";
+        }
+
+        #endregion Constructors
+
+        #region Methods
+
+        private void btnDecrypt_Click(object sender, EventArgs e)
+        {
+            txtPlain.Text = "";
+            if (string.IsNullOrWhiteSpace(txtCypher.Text) || string.IsNullOrWhiteSpace(txtKey.Text))
+            {
+                MessageBox.Show("Please enter the Plain text and the Key for encryption.");
+                return;
+            }
+            if (txtKey.Text.Length < 8)
+            {
+                MessageBox.Show("Key is too short.Should be of length 8");
+                txtKey.Focus();
+                return;
+            }
+            toolStripProgressBar1.Style = ProgressBarStyle.Marquee;
+            toolStripProgressBar1.MarqueeAnimationSpeed = 30;
+            toolStripProgressBar1.Visible = true;
+
+            SharedObject sharedObject = new SharedObject();
+
+            sharedObject.Algorithm = sltAlgorithm.SelectedIndex;
+            sharedObject.Mode = comboModes.SelectedIndex;
+            sharedObject.PlainText = txtPlain.Text;
+            sharedObject.CipherText = txtCypher.Text;
+            sharedObject.Key = txtKey.Text;
+            sharedObject.IsEncrypt = false;
+
+            backgroundWorkerThreadOne.RunWorkerAsync(sharedObject);
+        }
+
+        private void btnEncrypt_Click(object sender, EventArgs e)
+        {
+            txtCypher.Text = "";
+            if (string.IsNullOrWhiteSpace(txtPlain.Text) || string.IsNullOrWhiteSpace(txtKey.Text))
+            {
+                MessageBox.Show("Please enter the Plain text and the Key for encryption.");
+                return;
+            }
+
+            if (txtKey.Text.Length < 8)
+            {
+                MessageBox.Show("Key is too short.Should be of length 8");
+                txtKey.Focus();
+                return;
+            }
+
+            toolStripProgressBar1.Style = ProgressBarStyle.Marquee;
+            toolStripProgressBar1.MarqueeAnimationSpeed = 30;
+            toolStripProgressBar1.Visible = true;
+
+            SharedObject sharedObject = new SharedObject();
+
+            sharedObject.Algorithm = sltAlgorithm.SelectedIndex;
+            sharedObject.Mode = comboModes.SelectedIndex;
+            sharedObject.PlainText = txtPlain.Text;
+            sharedObject.CipherText = txtCypher.Text;
+            sharedObject.Key = txtKey.Text;
+            sharedObject.IsEncrypt = true;
+
+            backgroundWorkerThreadOne.RunWorkerAsync(sharedObject);
+        }
+
+        private void BwRunWorkerOneCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            SharedObject sharedObject = e.Result as SharedObject;
+            toolStripProgressBar1.Visible = false;
+            toolStripStatusLabel.Text = "Elapsed time: " + sharedObject.TimeTaken;
+
+            if (sharedObject.IsEncrypt)
+                txtCypher.Text = sharedObject.CipherText;
+            else
+                txtPlain.Text = sharedObject.PlainText;
+        }
+
+        private void chkLogging_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chkLogging.Checked)
+                Win32.AllocConsole();
+            else Win32.FreeConsole();
         }
 
         private void crytpoType_SelectedIndexChanged(object sender, EventArgs e)
@@ -37,7 +125,46 @@ namespace CryptoExamples
                 case 1: break;
                 case 2: break;
             }
+        }
 
+        private void DoWork(object sender, DoWorkEventArgs doWorkEventArgs)
+        {
+            DateTime begin = DateTime.UtcNow;
+
+            SharedObject sharedObject = doWorkEventArgs.Argument as SharedObject;
+            SharedObject resultObject = new SharedObject();
+            switch (sharedObject.Algorithm)
+            {
+                case 1:
+                    switch (sharedObject.Mode)
+                    {
+                        case 0:
+
+                            DESAlgorithm des = new DESAlgorithm();
+                            if (sharedObject.IsEncrypt)
+                                resultObject.CipherText = des.encrypt(sharedObject.PlainText, Utility.String2HexArray(sharedObject.Key, 16)[0]);
+                            else resultObject.PlainText = des.decrypt(sharedObject.CipherText, Utility.String2HexArray(sharedObject.Key, 16)[0]);
+                            break;
+                    }
+                    break;
+                case 2: break;
+                case 3: break;
+            }
+            DateTime end = DateTime.UtcNow;
+
+            resultObject.TimeTaken = (end - begin).ToString("c");
+            resultObject.IsEncrypt = sharedObject.IsEncrypt;
+
+            doWorkEventArgs.Result = resultObject;
+        }
+
+        private void EnableDisableControls(bool isEnabled)
+        {
+            txtCypher.Enabled = isEnabled;
+            txtKey.Enabled = isEnabled;
+            txtPlain.Enabled = isEnabled;
+            btnEncrypt.Enabled = isEnabled;
+            btnDecrypt.Enabled = isEnabled;
         }
 
         private void sltAlgorithm_SelectedIndexChanged(object sender, EventArgs e)
@@ -61,74 +188,11 @@ namespace CryptoExamples
                     comboModes.SelectedIndex = 0;
                     toolStripStatusLabel.Text = "Enter the Plain text and the Key(64 Bit/8 Characters)";
                     txtKey.MaxLength = 8;
+
                     break;
             }
-
         }
 
-        private void EnableDisableControls(bool isEnabled)
-        {
-            txtCypher.Enabled = isEnabled;
-            txtKey.Enabled = isEnabled;
-            txtPlain.Enabled = isEnabled;
-            btnEncrypt.Enabled = isEnabled;
-            btnDecrypt.Enabled = isEnabled;
-        }
-
-
-        private void chkLogging_CheckedChanged(object sender, EventArgs e)
-        {
-            if (chkLogging.Checked)
-                Win32.AllocConsole();
-            else Win32.FreeConsole();
-        }
-
-        private void btnEncrypt_Click(object sender, EventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(txtPlain.Text) || string.IsNullOrWhiteSpace(txtKey.Text))
-            {
-                MessageBox.Show("Please enter the Plain text and the Key for encryption.");
-            }
-
-            toolStripProgressBar1.Style = ProgressBarStyle.Marquee;
-            toolStripProgressBar1.MarqueeAnimationSpeed = 30;
-            toolStripProgressBar1.Visible = true;
-            backgroundWorkerThreadOne.RunWorkerAsync();
-
-
-        }
-
-
-
-
-        private void BwRunWorkerOneCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            toolStripProgressBar1.Visible = false;            
-        }
-
-        private void DoWork(object sender, DoWorkEventArgs doWorkEventArgs)
-        {
-
-            DateTime begin = DateTime.UtcNow;
-            switch (sltAlgorithm.SelectedIndex)
-            {
-                case 1:
-                    switch (comboModes.SelectedIndex)
-                    {
-                        case 0:
-
-                            DESAlgorithm des = new DESAlgorithm();
-                            string encryptedString = des.encrypt(txtPlain.Text, Utility.String2HexArray(txtKey.Text, 16)[0]);
-                            txtCypher.Text = encryptedString;
-                            break;
-                    }
-                    break;
-                case 2: break;
-                case 3: break;
-            }
-            DateTime end = DateTime.UtcNow;
-            toolStripStatusLabel.Text = "Elapsed time: " + (end - begin).ToString("c");
-        }
-        
+        #endregion Methods
     }
 }

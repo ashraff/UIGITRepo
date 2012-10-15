@@ -1,12 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace CryptoExamples.Util
+﻿namespace CryptoExamples.Util
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+
     class Constants
     {
+        #region Fields
+
+        public static Dictionary<int, string> DES_MODES = new Dictionary<int, string>()
+         {
+            {0,"Electronic Code Book (ECB)"},
+            {1,"Cipher Block Chaining (CBC)"},
+            {2,"Cipher Feedback (CFB)"},
+         };
         public static Dictionary<int, string> SKC_ALOGRITHMS = new Dictionary<int, string>()
         {   {0,""},
             {1,"Data Encryption Standard (DES)"},
@@ -35,11 +43,6 @@ namespace CryptoExamples.Util
             {24,"Skipjack"}
         };
 
-        public static Dictionary<int, string> DES_MODES = new Dictionary<int, string>()
-         { 
-            {0,"Electronic Code Book (ECB)"},
-            {1,"Chain Block Coding (CBC)"},
-            {2,"Cipher Feedback (CFB)"},
-         };
+        #endregion Fields
     }
 }
