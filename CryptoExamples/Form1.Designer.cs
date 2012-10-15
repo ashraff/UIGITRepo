@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.crytpoType = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.sltAlgorithm = new System.Windows.Forms.ComboBox();
@@ -43,12 +44,17 @@
             this.Key = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.btnGenerateKey = new System.Windows.Forms.Button();
+            this.txtInputVector = new System.Windows.Forms.TextBox();
+            this.label6 = new System.Windows.Forms.Label();
             this.btnDecrypt = new System.Windows.Forms.Button();
             this.btnEncrypt = new System.Windows.Forms.Button();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.backgroundWorkerThreadOne = new System.ComponentModel.BackgroundWorker();
+            this.btnGenerateIV = new System.Windows.Forms.Button();
+            this.toolTipControl = new System.Windows.Forms.ToolTip(this.components);
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.statusStrip.SuspendLayout();
@@ -134,6 +140,7 @@
             this.comboModes.Name = "comboModes";
             this.comboModes.Size = new System.Drawing.Size(181, 21);
             this.comboModes.TabIndex = 0;
+            this.comboModes.SelectedIndexChanged += new System.EventHandler(this.comboModes_SelectedIndexChanged);
             // 
             // txtKey
             // 
@@ -141,7 +148,7 @@
             this.txtKey.Location = new System.Drawing.Point(108, 286);
             this.txtKey.Multiline = true;
             this.txtKey.Name = "txtKey";
-            this.txtKey.Size = new System.Drawing.Size(304, 56);
+            this.txtKey.Size = new System.Drawing.Size(286, 56);
             this.txtKey.TabIndex = 8;
             // 
             // txtPlain
@@ -150,7 +157,7 @@
             this.txtPlain.Location = new System.Drawing.Point(108, 216);
             this.txtPlain.Multiline = true;
             this.txtPlain.Name = "txtPlain";
-            this.txtPlain.Size = new System.Drawing.Size(304, 59);
+            this.txtPlain.Size = new System.Drawing.Size(312, 59);
             this.txtPlain.TabIndex = 9;
             // 
             // txtCypher
@@ -159,13 +166,13 @@
             this.txtCypher.Location = new System.Drawing.Point(108, 351);
             this.txtCypher.Multiline = true;
             this.txtCypher.Name = "txtCypher";
-            this.txtCypher.Size = new System.Drawing.Size(304, 59);
+            this.txtCypher.Size = new System.Drawing.Size(312, 59);
             this.txtCypher.TabIndex = 10;
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(39, 216);
+            this.label3.Location = new System.Drawing.Point(36, 216);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(54, 13);
             this.label3.TabIndex = 11;
@@ -174,7 +181,7 @@
             // Key
             // 
             this.Key.AutoSize = true;
-            this.Key.Location = new System.Drawing.Point(39, 286);
+            this.Key.Location = new System.Drawing.Point(36, 286);
             this.Key.Name = "Key";
             this.Key.Size = new System.Drawing.Size(25, 13);
             this.Key.TabIndex = 12;
@@ -183,27 +190,60 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(42, 351);
+            this.label5.Location = new System.Drawing.Point(38, 351);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(64, 13);
+            this.label5.Size = new System.Drawing.Size(61, 13);
             this.label5.TabIndex = 13;
-            this.label5.Text = "Citpher Text";
+            this.label5.Text = "Cipher Text";
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.btnGenerateIV);
+            this.groupBox2.Controls.Add(this.btnGenerateKey);
+            this.groupBox2.Controls.Add(this.txtInputVector);
+            this.groupBox2.Controls.Add(this.label6);
             this.groupBox2.Controls.Add(this.btnDecrypt);
             this.groupBox2.Controls.Add(this.btnEncrypt);
             this.groupBox2.Location = new System.Drawing.Point(25, 192);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(418, 269);
+            this.groupBox2.Size = new System.Drawing.Size(418, 323);
             this.groupBox2.TabIndex = 14;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Data Encrypt/Decrypt";
             // 
+            // btnGenerateKey
+            // 
+            this.btnGenerateKey.Enabled = false;
+            this.btnGenerateKey.Location = new System.Drawing.Point(371, 94);
+            this.btnGenerateKey.Name = "btnGenerateKey";
+            this.btnGenerateKey.Size = new System.Drawing.Size(24, 56);
+            this.btnGenerateKey.TabIndex = 4;
+            this.btnGenerateKey.Text = "G";
+            this.toolTipControl.SetToolTip(this.btnGenerateKey, "Generate Key[Encryption Pupose Only]");
+            this.btnGenerateKey.UseVisualStyleBackColor = true;
+            this.btnGenerateKey.Click += new System.EventHandler(this.btnGenerateKey_Click);
+            // 
+            // txtInputVector
+            // 
+            this.txtInputVector.Enabled = false;
+            this.txtInputVector.Location = new System.Drawing.Point(83, 231);
+            this.txtInputVector.Name = "txtInputVector";
+            this.txtInputVector.Size = new System.Drawing.Size(286, 20);
+            this.txtInputVector.TabIndex = 3;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(12, 231);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(65, 13);
+            this.label6.TabIndex = 2;
+            this.label6.Text = "Input Vector";
+            // 
             // btnDecrypt
             // 
             this.btnDecrypt.Enabled = false;
-            this.btnDecrypt.Location = new System.Drawing.Point(312, 235);
+            this.btnDecrypt.Location = new System.Drawing.Point(312, 288);
             this.btnDecrypt.Name = "btnDecrypt";
             this.btnDecrypt.Size = new System.Drawing.Size(75, 23);
             this.btnDecrypt.TabIndex = 1;
@@ -214,7 +254,7 @@
             // btnEncrypt
             // 
             this.btnEncrypt.Enabled = false;
-            this.btnEncrypt.Location = new System.Drawing.Point(212, 235);
+            this.btnEncrypt.Location = new System.Drawing.Point(212, 288);
             this.btnEncrypt.Name = "btnEncrypt";
             this.btnEncrypt.Size = new System.Drawing.Size(75, 23);
             this.btnEncrypt.TabIndex = 0;
@@ -227,7 +267,7 @@
             this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripProgressBar1,
             this.toolStripStatusLabel});
-            this.statusStrip.Location = new System.Drawing.Point(0, 495);
+            this.statusStrip.Location = new System.Drawing.Point(0, 528);
             this.statusStrip.Name = "statusStrip";
             this.statusStrip.Size = new System.Drawing.Size(469, 22);
             this.statusStrip.TabIndex = 16;
@@ -245,11 +285,23 @@
             this.toolStripStatusLabel.Name = "toolStripStatusLabel";
             this.toolStripStatusLabel.Size = new System.Drawing.Size(0, 17);
             // 
+            // btnGenerateIV
+            // 
+            this.btnGenerateIV.Enabled = false;
+            this.btnGenerateIV.Location = new System.Drawing.Point(374, 230);
+            this.btnGenerateIV.Name = "btnGenerateIV";
+            this.btnGenerateIV.Size = new System.Drawing.Size(24, 22);
+            this.btnGenerateIV.TabIndex = 5;
+            this.btnGenerateIV.Text = "G";
+            this.toolTipControl.SetToolTip(this.btnGenerateIV, "Generate Input Vector[Encryption Pupose Only]");
+            this.btnGenerateIV.UseVisualStyleBackColor = true;
+            this.btnGenerateIV.Click += new System.EventHandler(this.btnGenerateIV_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(469, 517);
+            this.ClientSize = new System.Drawing.Size(469, 550);
             this.Controls.Add(this.statusStrip);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.Key);
@@ -273,6 +325,7 @@
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.statusStrip.ResumeLayout(false);
             this.statusStrip.PerformLayout();
             this.ResumeLayout(false);
@@ -303,6 +356,11 @@
         private System.ComponentModel.BackgroundWorker backgroundWorkerThreadOne;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.ComboBox comboModes;
+        private System.Windows.Forms.TextBox txtInputVector;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Button btnGenerateKey;
+        private System.Windows.Forms.Button btnGenerateIV;
+        private System.Windows.Forms.ToolTip toolTipControl;
     }
 }
 

@@ -40,6 +40,14 @@
                 txtKey.Focus();
                 return;
             }
+
+            if (comboModes.SelectedIndex == 1 && string.IsNullOrWhiteSpace(txtInputVector.Text))
+            {
+                MessageBox.Show("Please enter the Input Vector(IV) for CBC Mode.");
+                txtInputVector.Focus();
+                return;
+            }
+
             toolStripProgressBar1.Style = ProgressBarStyle.Marquee;
             toolStripProgressBar1.MarqueeAnimationSpeed = 30;
             toolStripProgressBar1.Visible = true;
@@ -50,6 +58,7 @@
             sharedObject.Mode = comboModes.SelectedIndex;
             sharedObject.PlainText = txtPlain.Text;
             sharedObject.CipherText = txtCypher.Text;
+            sharedObject.InputVector = txtInputVector.Text;
             sharedObject.Key = txtKey.Text;
             sharedObject.IsEncrypt = false;
 
@@ -72,6 +81,14 @@
                 return;
             }
 
+
+            if (comboModes.SelectedIndex == 1 && string.IsNullOrWhiteSpace(txtInputVector.Text))
+            {
+                MessageBox.Show("Please enter the Input Vector(IV) for CBC Mode.");
+                txtInputVector.Focus();
+                return;
+            }
+
             toolStripProgressBar1.Style = ProgressBarStyle.Marquee;
             toolStripProgressBar1.MarqueeAnimationSpeed = 30;
             toolStripProgressBar1.Visible = true;
@@ -83,6 +100,7 @@
             sharedObject.PlainText = txtPlain.Text;
             sharedObject.CipherText = txtCypher.Text;
             sharedObject.Key = txtKey.Text;
+            sharedObject.InputVector = txtInputVector.Text;
             sharedObject.IsEncrypt = true;
 
             backgroundWorkerThreadOne.RunWorkerAsync(sharedObject);
@@ -98,6 +116,9 @@
                 txtCypher.Text = sharedObject.CipherText;
             else
                 txtPlain.Text = sharedObject.PlainText;
+
+            if(!string.IsNullOrWhiteSpace(sharedObject.InputVector))
+                txtInputVector.Text = sharedObject.InputVector;
         }
 
         private void chkLogging_CheckedChanged(object sender, EventArgs e)
@@ -136,16 +157,13 @@
             switch (sharedObject.Algorithm)
             {
                 case 1:
-                    switch (sharedObject.Mode)
-                    {
-                        case 0:
 
-                            DESAlgorithm des = new DESAlgorithm();
-                            if (sharedObject.IsEncrypt)
-                                resultObject.CipherText = des.encrypt(sharedObject.PlainText, Utility.String2HexArray(sharedObject.Key, 16)[0]);
-                            else resultObject.PlainText = des.decrypt(sharedObject.CipherText, Utility.String2HexArray(sharedObject.Key, 16)[0]);
-                            break;
-                    }
+
+                    DESAlgorithm des = new DESAlgorithm();
+                    if (sharedObject.IsEncrypt)
+                        resultObject = des.encrypt(sharedObject);
+                    else resultObject = des.decrypt(sharedObject);
+
                     break;
                 case 2: break;
                 case 3: break;
@@ -165,6 +183,8 @@
             txtPlain.Enabled = isEnabled;
             btnEncrypt.Enabled = isEnabled;
             btnDecrypt.Enabled = isEnabled;
+            btnGenerateKey.Enabled = isEnabled;
+            btnGenerateIV.Enabled = isEnabled;
         }
 
         private void sltAlgorithm_SelectedIndexChanged(object sender, EventArgs e)
@@ -194,5 +214,24 @@
         }
 
         #endregion Methods
+
+        private void comboModes_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (comboModes.SelectedIndex == 1)
+                txtInputVector.Enabled = true;
+            else txtInputVector.Enabled = false;
+        }
+
+        private void btnGenerateKey_Click(object sender, EventArgs e)
+        {
+            txtKey.Text = Guid.NewGuid().ToString("N").Substring(0, 8); 
+        }
+
+        private void btnGenerateIV_Click(object sender, EventArgs e)
+        {
+           txtInputVector.Text  = Guid.NewGuid().ToString("N").Substring(0, 8); 
+        }
+
+        
     }
 }

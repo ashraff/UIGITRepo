@@ -49,6 +49,13 @@
             get; set;
         }
 
+        public string InputVector
+        {
+            get;
+            set;
+        }
+
         #endregion Properties
     }
+    
 }

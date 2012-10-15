@@ -12,47 +12,76 @@
     {
         #region Methods
 
-        public string decrypt(string data, string key)
+        public SharedObject decrypt(SharedObject inputObject)
         {
-            string[] subKeys = createSubkeys(key);
+            string[] subKeys = createSubkeys(Utility.String2HexArray(inputObject.Key, 16)[0]);
             Array.Reverse(subKeys);
 
             /* Convert the string into hexadecimal form and split it as 16 character hex.
              * If the splitted string is not of 16 character it right pads with 0 */
-            string[] hexDataArray = Regex.Replace(data, @"(.{16})", "$1 ").Split(' ');
-
+            string[] hexDataArray = Regex.Replace(inputObject.CipherText, @"(.{16})", "$1 ").Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries);
             /* To Test hexDataArray = new string[]{"0123456789ABCDEF"};*/
 
             string decryptedData = "";
+            string decryptedBlock = "";
+            string inputVector = "";
             for (int i = 0; i < hexDataArray.Length; i++)
             {
-                if (!string.IsNullOrWhiteSpace(hexDataArray[i]))
-                    decryptedData += encodeData(hexDataArray[i], subKeys);
+              decryptedBlock = encodeData(hexDataArray[i], subKeys);
+              if (inputObject.Mode == 1)
+              {
+                  if (i == 0)
+                  {
+                      inputVector = Utility.String2HexArray(inputObject.InputVector, 16)[0];
+                      decryptedBlock = Utility.XORBinaryString(Utility.Hex2Binary(decryptedBlock), Utility.Hex2Binary(inputVector));
+                  }
+                  else
+                      decryptedBlock = Utility.XORBinaryString(Utility.Hex2Binary(hexDataArray[i-1]), Utility.Hex2Binary(decryptedBlock));
+              }
+
+              decryptedData += Utility.Binary2Hex(decryptedBlock);
             }
 
+            SharedObject resultObject = new SharedObject();
+            resultObject.PlainText = Utility.Hex2String(decryptedData);
+            resultObject.CipherText = inputObject.PlainText;
+
             Logger.Log(this.GetType(), "Decrypted Data" + decryptedData);
-            return Utility.Hex2String(decryptedData);
+            return resultObject;
         }
 
-        public string encrypt(string data, string key)
+        public SharedObject encrypt(SharedObject inputObject)
         {
-            string[] subKeys =  createSubkeys(key);
+            string[] subKeys = createSubkeys(Utility.String2HexArray(inputObject.Key, 16)[0]);
 
             /* Convert the string into hexadecimal form and split it as 16 character hex.
              * If the splitted string is not of 16 character it right pads with 0 */
-            string[] hexDataArray = Utility.String2HexArray(data,16);
-
-            /* To Test hexDataArray = new string[]{"0123456789ABCDEF"};*/
+            string[] hexDataArray = Utility.String2HexArray(inputObject.PlainText, 16);
 
             string encryptedData = "";
+            string encyptedBlock = "";
+            string inputVector = "";
+            
             for (int i = 0; i < hexDataArray.Length; i++)
-            {
-                if (!string.IsNullOrWhiteSpace(hexDataArray[i]))
-                    encryptedData += encodeData(hexDataArray[i], subKeys);
+            {  
+                    if (inputObject.Mode == 1)
+                    {
+                        if (i == 0)
+                        {
+                            inputVector = Utility.String2HexArray(inputObject.InputVector, 16)[0];
+                            hexDataArray[i] = Utility.Binary2Hex(Utility.XORBinaryString(Utility.Hex2Binary(hexDataArray[i]),Utility.Hex2Binary(inputVector)));
+                        }
+                        else hexDataArray[i] = Utility.Binary2Hex(Utility.XORBinaryString(Utility.Hex2Binary(hexDataArray[i]), Utility.Hex2Binary(encyptedBlock))); 
+                    }
+                    encyptedBlock = encodeData(hexDataArray[i], subKeys);
+                    encryptedData += encyptedBlock;
             }
-
+            SharedObject resultObject = new SharedObject();
+            resultObject.PlainText = inputObject.PlainText;
+            resultObject.CipherText = encryptedData;
+            resultObject.InputVector = Utility.Hex2String(inputVector);
             Logger.Log(this.GetType(), "Encrypted Data" + encryptedData);
-            return encryptedData;
+            return resultObject;
         }
 
         private string applyFeistelFunction(string L, string R, string K)

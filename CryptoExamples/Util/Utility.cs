@@ -80,7 +80,7 @@
 
         public static string[] String2HexArray(string data,int hexlength)
         {
-            return (from str in (Regex.Replace(BitConverter.ToString(Encoding.ASCII.GetBytes(data)).Replace("-", ""), @"(.{" + hexlength + "})", "$1 ").Split(' ')) select str.PadRight(hexlength, '0')).ToArray();
+            return (from str in (Regex.Replace(BitConverter.ToString(Encoding.ASCII.GetBytes(data)).Replace("-", ""), @"(.{" + hexlength + "})", "$1 ").Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)) select str.PadRight(hexlength, '0')).ToArray();
         }
 
         public static string XORBinaryString(string one, string two)
